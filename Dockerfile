@@ -42,7 +42,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Clone and configure application code
-RUN git clone https://github.com/sporchia/alttp_vt_randomizer.git -b vt8.25 --single-branch /root/vt \
+RUN git clone https://github.com/sporchia/alttp_vt_randomizer.git -b vt8.26 --single-branch /root/vt \
     && cd /root/vt \
     && mv .env.example .env \
     && sed -i 's/DB_DATABASE=.*$/DB_DATABASE=\/root\/vt\/database\/randomizer.sqlite/g' .env
