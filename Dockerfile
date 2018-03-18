@@ -20,29 +20,33 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         gnupg2 \
         libzip4 \
-        php7.0 \
-        php7.0-bcmath \
-        php7.0-curl \
-        php7.0-dom \
-        php7.0-mbstring \
-        php7.0-sqlite \
-        php7.0-zip \
         sqlite3 \
         wget
 
 # Configure additional repositories
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
-    && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+    && curl -sS https://packages.sury.org/php/apt.gpg | apt-key add - \
+    && echo "deb https://packages.sury.org/php/ stretch main" | tee /etc/apt/sources.list.d/php.list
 
 # Install additional packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
+        autoconf \
+        automake \
+        g++ \
+        libpng-dev \
+        make \
         nodejs \
-        yarn \
+        php7.1 \
+        php7.1-bcmath \
+        php7.1-curl \
+        php7.1-dom \
+        php7.1-mbstring \
+        php7.1-sqlite \
+        php7.1-zip \
     && rm -rf /var/lib/apt/lists/*
 
 # Clone and configure application code
-RUN git clone https://github.com/sporchia/alttp_vt_randomizer.git -b v28 --single-branch /root/vt \
+RUN git clone https://github.com/sporchia/alttp_vt_randomizer.git -b vt29 --single-branch /root/vt \
     && cd /root/vt \
     && mv .env.example .env \
     && sed -i 's/DB_DATABASE=.*$/DB_DATABASE=\/root\/vt\/database\/randomizer.sqlite/g' .env
@@ -54,9 +58,8 @@ RUN wget https://raw.githubusercontent.com/composer/getcomposer.org/master/web/i
     && php artisan config:cache \
     && sqlite3 database/randomizer.sqlite ".databases" \
     && php artisan migrate \
-    && sqlite3 database/randomizer.sqlite "ALTER TABLE seeds ADD patch_id INTEGER default 0" \
-    && yarn \
-    && ./node_modules/gulp/bin/gulp.js --production
+    && npm install \
+    && npm run production
 
 # Expose default port
 EXPOSE 8000
