@@ -59,6 +59,7 @@ RUN wget https://raw.githubusercontent.com/composer/getcomposer.org/master/web/i
     && php artisan config:cache \
     && sqlite3 database/randomizer.sqlite ".databases" \
     && php artisan migrate \
+    && php artisan alttp:updatebuildrecord \
     && npm install \
     && npm run production
 
