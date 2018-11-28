@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         wget
 
 # Configure additional repositories
-RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - \
     && curl -sS https://packages.sury.org/php/apt.gpg | apt-key add - \
     && echo "deb https://packages.sury.org/php/ stretch main" | tee /etc/apt/sources.list.d/php.list
 
@@ -36,19 +36,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libpng-dev \
         make \
         nodejs \
-        php7.1 \
-        php7.1-bcmath \
-        php7.1-curl \
-        php7.1-dom \
-        php7.1-mbstring \
-        php7.1-sqlite \
-        php7.1-zip \
+        php7.2 \
+        php7.2-bcmath \
+        php7.2-curl \
+        php7.2-dom \
+        php7.2-mbstring \
+        php7.2-sqlite \
+        php7.2-zip \
     && rm -rf /var/lib/apt/lists/*
 
 # Clone and configure application code
-RUN git clone https://github.com/sporchia/alttp_vt_randomizer.git /root/vt \
-    && cd /root/vt \
-    && git checkout d466616b19dd77d66ad8391fc287aa8fbc518d9d \
+RUN git clone https://github.com/sporchia/alttp_vt_randomizer.git -b v30.3 --single-branch /root/vt \
     && mv .env.example .env \
     && sed -i 's/DB_DATABASE=.*$/DB_DATABASE=\/root\/vt\/database\/randomizer.sqlite/g' .env
 
@@ -60,7 +58,8 @@ RUN wget https://raw.githubusercontent.com/composer/getcomposer.org/master/web/i
     && sqlite3 database/randomizer.sqlite ".databases" \
     && php artisan migrate \
     && php artisan alttp:updatebuildrecord \
-    && npm install \
+    && php artisan vue-i18n:generate \
+    && npm install --unsafe-perm \
     && npm run production
 
 # Expose default port
